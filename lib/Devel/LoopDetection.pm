@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Carp qw(croak);
-use Scope::Upper qw(localize SCOPE);
+use Scope::Upper qw(localize_elem SCOPE);
 
 our @EXPORT_OK;
 
@@ -56,16 +56,13 @@ sub am_looping() {
 
   no strict 'refs'; # we're about to make up a varname
 
-  # This blatently abuses the fact that you can give a varible any name
-  # you want - even "invalid" ones - you just can't directly refer to
-  # them in the source.  We *could* do some kind of hashing here or coding
-  # of the name here, but I'm avoiding that for performance reasons.
-
+  # work out a unique "name" for this file/line
   my (undef, $filename, $line) = defined(&DB::sub) ? caller(3) : caller;
-  my $name = "Babel::LoopDetection::Loop::${filename}::line${line}";
+  my $name = $filename . ":line " . $line;
 
   # are we looping?
-  return 1 if ${$name};
+  our %tracker; ## no critic (ProhibitPackageVars)
+  return 1 if exists $tracker{$name};
 
   # create a new local variable in our caller's scope so we can track
   # dynamic scope
@@ -74,7 +71,7 @@ sub am_looping() {
   # and we assume that it is inserting an extra stack frame that
   # we need to skip.  caller() doesn't show such a stack frame,
   # so we're forced to guess.
-  localize *{$name}, \1, defined(&DB::sub) ? SCOPE(3) : SCOPE(1);
+  localize_elem '%Devel::LoopDetection::tracker', $name, 1, defined(&DB::sub) ? SCOPE(3) : SCOPE(1);
 
   return;
 }
