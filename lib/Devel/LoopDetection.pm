@@ -9,6 +9,8 @@ use Scope::Upper qw(localize SCOPE);
 
 our @EXPORT_OK;
 
+our $VERSION = "1.00";
+
 =head1 NAME
 
 Devel::LoopDetection - simple protection against looping
@@ -78,7 +80,9 @@ sub am_looping() {
 }
 push @EXPORT_OK, "am_looping";
 
-=head1 COPYRIGHT
+=back
+
+=head1 AUTHOR
 
 Written by Mark Fowler C<mark@twoshortplanks.com>
 
