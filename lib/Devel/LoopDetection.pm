@@ -54,10 +54,8 @@ true.
 sub am_looping() {
   croak "am_looping called with wrong number of arguments" unless @_ == 0;
 
-  no strict 'refs'; # we're about to make up a varname
-
   # work out a unique "name" for this file/line
-  my (undef, $filename, $line) = defined(&DB::sub) ? caller(3) : caller;
+  my (undef, $filename, $line) = caller;
   my $name = $filename . ":line " . $line;
 
   # are we looping?
